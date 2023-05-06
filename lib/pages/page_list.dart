@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lista_tarefas/models/tarefa.dart';
+import 'package:lista_tarefas/respositories/lista_repository.dart';
 import 'package:lista_tarefas/widgets/tarefa_list_item.dart';
 
 class PageList extends StatefulWidget {
@@ -11,10 +12,22 @@ class PageList extends StatefulWidget {
 
 class _PageListState extends State<PageList> {
   final TextEditingController tarefasController = TextEditingController();
+  final ListaRepository listaRepository = ListaRepository();
 
   List<Tarefa> Listtarefas = [];
   Tarefa? deletarTarefa;
   int? deletarTarefaPosicao;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    listaRepository.getListaTarefas().then((value) {
+      setState(() {
+        Listtarefas = value;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +65,7 @@ class _PageListState extends State<PageList> {
                           Listtarefas.add(newTarefa);
                         });
                         tarefasController.clear();
+                        listaRepository.saveListTarefas(Listtarefas);
                       },
                       style: ElevatedButton.styleFrom(
                         primary: const Color(0xff00d7f3),
@@ -117,6 +131,7 @@ class _PageListState extends State<PageList> {
     setState(() {
       Listtarefas.remove(tarefa);
     });
+    listaRepository.saveListTarefas(Listtarefas);
 
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -135,6 +150,7 @@ class _PageListState extends State<PageList> {
             setState(() {
               Listtarefas.insert(deletarTarefaPosicao!, deletarTarefa!);
             });
+            listaRepository.saveListTarefas(Listtarefas);
           },
         ),
       ),
@@ -172,5 +188,6 @@ class _PageListState extends State<PageList> {
     setState(() {
       Listtarefas.clear();
     });
+    listaRepository.saveListTarefas(Listtarefas);
   }
 }
